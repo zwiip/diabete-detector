@@ -2,13 +2,17 @@ package com.medilabo.patientservice.repositories;
 
 import com.medilabo.patientservice.entities.Patient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-public class PatientRepositoryTest {
+class PatientRepositoryTest {
 
     @Autowired
     private PatientRepository patientRepository;
@@ -32,5 +36,15 @@ public class PatientRepositoryTest {
         patientRepository.save(patientEarlyOnset);
     }
 
+    @Test
+    void savedPatientIDShouldNotBeNull() {
+        assertNotNull(patientNone.getId());
+    }
+
+    @Test
+    void findAllPatientsShouldReturnFour() {
+        List<Patient> patients = patientRepository.findAll();
+        assertEquals(4, patients.size());
+    }
 
 }
