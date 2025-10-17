@@ -1,10 +1,18 @@
 package com.medilabo.patientservice.entities;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "patients")
 public class Patient {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
 
     @NotBlank(message = "Name must not be null")
@@ -36,7 +44,7 @@ public class Patient {
 
     public Patient() {}
 
-    public Patient(String name, String firstName, LocalDate birthDate, com.medilabo.patientservice.entities.Patient.Gender gender, String address, String phone) {
+    public Patient(String name, String firstName, LocalDate birthDate, Gender gender, String address, String phone) {
         this.name = name;
         this.firstName = firstName;
         this.birthDate = birthDate;
@@ -49,6 +57,14 @@ public class Patient {
         MALE,
         FEMALE,
         OTHER
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
