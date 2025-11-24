@@ -2,10 +2,10 @@ package com.medilabo.patientservice.controllers;
 
 import com.medilabo.patientservice.entities.Patient;
 import com.medilabo.patientservice.services.PatientService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,5 +34,21 @@ public class PatientController {
             @RequestParam(required = false) Patient.Gender gender
     ) {
         return patientService.searchPatients(name, firstName, birthDate, gender);
+    }
+
+    @PostMapping
+    public ResponseEntity<Patient> addPatient(@RequestBody Patient patient) {
+        Patient savedPatient = patientService.savePatient(patient);
+        return new ResponseEntity<>(savedPatient, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePatient(@PathVariable Integer id) {
+        try {
+            patientService.deletePatient(id);
+            return ResponseEntity.noContent().build();
+        } catch (EmptyResultDataAccessException error) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
