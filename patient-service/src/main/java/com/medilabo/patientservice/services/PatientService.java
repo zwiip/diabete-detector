@@ -2,6 +2,7 @@ package com.medilabo.patientservice.services;
 
 import com.medilabo.patientservice.entities.Patient;
 import com.medilabo.patientservice.repositories.PatientRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,6 +40,9 @@ public class PatientService {
     }
 
     public void deletePatient(Integer id) {
+        if (!patientRepository.existsById(id)) {
+            throw new EmptyResultDataAccessException(1);
+        }
         patientRepository.deleteById(id);
     }
 }
