@@ -3,6 +3,7 @@ package com.medilabo.front_service.controller;
 import com.medilabo.front_service.dto.PatientDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,26 +23,32 @@ public class PatientController {
     @Value("${gateway.url}")
     private String gatewayUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
-    @GetMapping("/patients")
+    public PatientController(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    @GetMapping("/patients/search")
     public String listPatients(@RequestParam(required = false) String name,
                                @RequestParam(required = false) String firstName,
-                               @RequestParam(required = false) LocalDate birthDate,
+                               @RequestParam(required = false)
+                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                   LocalDate birthDate,
                                @RequestParam(required = false) String gender,
                                Model model) {
 
 
-        String url = UriComponentsBuilder.fromHttpUrl(gatewayUrl  + "/patients")
+        String url = UriComponentsBuilder.fromHttpUrl(gatewayUrl  + "/patients/search")
             .queryParamIfPresent("name", Optional.ofNullable(name))
             .queryParamIfPresent("firstName", Optional.ofNullable(firstName))
             .queryParamIfPresent("birthDate", Optional.ofNullable(birthDate))
             .queryParamIfPresent("gender", Optional.ofNullable(gender))
             .toUriString();
 
-        List<PatientDTO> patients = Arrays.asList(
-                restTemplate.getForObject(url, PatientDTO[].class)
-        );
+
+        PatientDTO[] response = restTemplate.getForObject(url, PatientDTO[].class);
+        List<PatientDTO> patients = Arrays.asList(response);
 
         model.addAttribute("patients", patients);
         model.addAttribute("name", name);

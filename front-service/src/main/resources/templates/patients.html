@@ -10,7 +10,7 @@
     <h1>Liste des patients</h1>
 
     <!-- Zone de recherche et de filtrage -->
-    <form th:action="@{/patients}" method="get" class="search-form">
+    <form th:action="@{/patients/search}" method="get" class="search-form">
         <div class="filter-group">
             <input type="text" name="name" placeholder="Nom" th:value="${name}" />
             <input type="text" name="firstName" placeholder="Prénom" th:value="${firstName}" />
