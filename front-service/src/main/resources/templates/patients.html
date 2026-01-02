@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des patients</title>
+    <!--<link rel="stylesheet" href="/css/styles.css"> -->
+</head>
+<body>
+<div class="container">
+    <h1>Liste des patients</h1>
+
+    <!-- Zone de recherche et de filtrage -->
+    <form th:action="@{/patients}" method="get" class="search-form">
+        <div class="filter-group">
+            <input type="text" name="name" placeholder="Nom" th:value="${name}" />
+            <input type="text" name="firstName" placeholder="Prénom" th:value="${firstName}" />
+            <input type="date" name="birthDate" placeholder="Date de naissance" th:value="${birthDate}" />
+            <select name="gender">
+                <option value="">Genre</option>
+                <option value="MALE" th:selected="${gender == 'MALE'}">Homme</option>
+                <option value="FEMALE" th:selected="${gender == 'FEMALE'}">Femme</option>
+                <option value="OTHER" th:selected="${gender == 'OTHER'}">Autre</option>
+            </select>
+            <button type="submit" class="search-button">Rechercher</button>
+        </div>
+    </form>
+
+    <!-- Tableau de la liste des patients -->
+    <table class="patient-table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Date de naissance</th>
+            <th>Genre</th>
+            <th>Adresse</th>
+            <th>Téléphone</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr th:each="patient : ${patients}">
+            <td th:text="${patient.name}">Nom</td>
+            <td th:text="${patient.firstName}">Prénom</td>
+            <td th:text="${#temporals.format(patient.birthDate, 'dd/MM/yyyy')}"></td>
+            <td th:text="${patient.gender}">Genre</td>
+            <td th:text="${patient.address}">Adresse</td>
+            <td th:text="${patient.phone}">Téléphone</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(patients)}">
+            <td colspan="6">Aucun patient trouvé</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Bouton pour ajouter un nouveau patient -->
+    <div class="add-patient">
+        <a th:href="@{/patients/new}" class="add-button">+ Ajouter un patient</a>
+    </div>
+</div>
+</body>
+</html>
