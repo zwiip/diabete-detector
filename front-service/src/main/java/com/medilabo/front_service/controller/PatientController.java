@@ -48,6 +48,7 @@ public class PatientController {
         PatientDTO[] response = restTemplate.getForObject(url, PatientDTO[].class);
         List<PatientDTO> patients = Arrays.asList(response);
 
+        model.addAttribute("activePage", "patients/search");
         model.addAttribute("patients", patients);
         model.addAttribute("name", name);
         model.addAttribute("firstName", firstName);

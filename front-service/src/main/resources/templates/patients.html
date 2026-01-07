@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Liste des patients</title>
-    <!--<link rel="stylesheet" href="/css/styles.css"> -->
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     <header th:insert="~{header}"></header>
-    <div class="container">
+    <main>
         <h1>Liste des patients</h1>
 
         <!-- Zone de recherche et de filtrage -->
-        <form th:action="@{/patients/search}" method="get" class="search-form">
+        <form th:action="@{/patients/search}" method="get">
             <div class="filter-group">
                 <input type="text" name="name" placeholder="Nom" th:value="${name}" />
                 <input type="text" name="firstName" placeholder="Prénom" th:value="${firstName}" />
@@ -22,12 +22,12 @@
                     <option value="FEMALE" th:selected="${gender == 'FEMALE'}">Femme</option>
                     <option value="OTHER" th:selected="${gender == 'OTHER'}">Autre</option>
                 </select>
-                <button type="submit" class="search-button">Rechercher</button>
+                <button type="submit">Rechercher</button>
             </div>
         </form>
 
         <!-- Tableau de la liste des patients -->
-        <table class="patient-table">
+        <table>
             <thead>
             <tr>
                 <th>Nom</th>
@@ -58,6 +58,6 @@
         <div class="add-patient">
             <a th:href="@{/patients/new}" class="add-button">+ Ajouter un patient</a>
         </div>
-    </div>
+    </main>
 </body>
 </html>
