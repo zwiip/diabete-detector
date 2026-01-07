@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Medilabo Solution</title>
+</head>
+<body>
+    <div class="header" th:fragment="header">
+        <img th:src="@{/images/logo_medilabo.png}" alt="Logo MediLabo">
+        <nav>
+            <ul>
+                <li><a th:href="@{/patients/search}" th:classappend="${activePage == 'patients'} ? 'active-link' : ''">Rechercher</a></li>
+                <li><a th:href="logout">Se déconnecter</a></li>
+            </ul>
+        </nav>
+    </div>
+
+</body>
+</html>
