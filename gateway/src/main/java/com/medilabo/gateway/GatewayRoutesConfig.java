@@ -17,6 +17,7 @@ public class GatewayRoutesConfig {
     public RouterFunction<ServerResponse> diabeteDetectorRoutes() {
         return route("patient-service")
                 .route(path("patients/**"), http())
+                .route(path("/patients"), http())
                 .before(uri("http://localhost:8081"))
                 .build();
     }

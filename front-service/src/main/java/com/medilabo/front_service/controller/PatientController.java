@@ -6,6 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -55,6 +57,23 @@ public class PatientController {
         model.addAttribute("birthDate", birthDate);
         model.addAttribute("gender", gender);
         return "patients";
+    }
+
+    @GetMapping("patients/new")
+    public String addPatientForm() {
+        return "new";
+    }
+
+    @PostMapping("/patients")
+    public String createPatient(@ModelAttribute PatientDTO patient) {
+
+        restTemplate.postForObject(
+                gatewayUrl + "/patients",
+                patient,
+                Void.class
+        );
+
+        return "redirect:/patients/search";
     }
 }
 
