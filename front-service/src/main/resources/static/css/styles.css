@@ -3,11 +3,18 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    --color-text-dark: #333;
+    --color-text-light: #fff;
+    --color-primary: #2f80ed;
+    --color-primary-darker: #2568c7;
+    --color-secondary: #f2f4f7;
+    --color-secondary-darker: #e0e0e0;
+    --color-secondary-lighter: #FAFCFF;
 }
 
 body {
     font-family: Roboto, sans-serif;
-    color: #333;
+    color: var(--color-text-dark);
     line-height: 1.5;
     padding: 2rem;
     max-width: 1100px;
@@ -15,7 +22,7 @@ body {
 }
 
 .add-link {
-    color: #2f80ed;
+    color: var(--color-primary);
 }
 
 /* HEADER */
@@ -24,7 +31,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem;
-    border-bottom: 1px solid #f2f4f7;
+    border-bottom: 1px solid var(--color-secondary);
     margin-bottom: 1rem;
 }
 
@@ -46,11 +53,11 @@ body {
 }
 
 .header nav ul li a:hover {
-    color: #2f80ed;
+    color: var(--color-primary);
 }
 
 .header nav ul li a.active-link {
-    color: #2f80ed;
+    color: var(--color-primary);
 }
 
 /* FORMS AND INPUTS */
@@ -61,13 +68,13 @@ form {
 input, select {
     padding: 0.5rem 0.6rem;
     font-size: 0.9rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-secondary-darker);
     border-radius: 4px;
     min-width: 160px;
 }
 
 input::placeholder {
-    color: #333;
+    color: var(--color-text-dark);
 }
 
 button {
@@ -75,13 +82,13 @@ button {
     font-size: 0.9rem;
     border: none;
     border-radius: 4px;
-    background-color: #2f80ed;
-    color: #fff;
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #2568c7;
+    background-color: var(--color-primary-darker);
 }
 
 .filter-group {
@@ -112,15 +119,15 @@ button:hover {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
     border-radius: 4px;
-    background-color: #e0e0e0;
-    color: #333;
+    background-color: var(--color-secondary);
+    color: var(--color-text-dark);
     text-decoration: none;
     font-weight: 500;
     cursor: pointer;
 }
 
 .btn-secondary:hover {
-    background-color: #cfcfcf;
+    background-color: var(--color-secondary-darker);
 }
 
 /* TABLES */
@@ -129,21 +136,21 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 1.5rem;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--color-secondary-darker);
 }
 
 table th, table td {
     padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--color-secondary-darker);
     text-align: left;
     font-size: 0.9rem;
 }
 
 table th {
-    background-color: #f2f4f7;
+    background-color: var(--color-secondary);
     font-weight: 600;
 }
 
 table tr:hover {
-    background-color: #fafafa;
+    background-color: var(--color-secondary-lighter);
 }
