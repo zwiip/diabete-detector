@@ -14,6 +14,10 @@ body {
     margin: 0 auto;
 }
 
+.add-link {
+    color: #2f80ed;
+}
+
 /* HEADER */
 .header {
     display:flex;
