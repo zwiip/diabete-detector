@@ -55,10 +55,10 @@ class PatientServiceTest {
     void givenAnExistingID_whenGetPatientById_shouldReturnTheCorrectPatient() {
         when(patientRepository.findById(1)).thenReturn(Optional.ofNullable(patientNone));
 
-        Optional<Patient> patient = patientService.getPatientById(1);
+        Patient patient = patientService.getPatientById(1);
 
-        assertTrue(patient.isPresent());
-        assertEquals("TestNone", patient.get().getName());
+        assertNotNull(patient);
+        assertEquals("TestNone", patient.getName());
     }
 
     @Test

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/patients")
@@ -36,19 +37,35 @@ public class PatientController {
         return patientService.searchPatients(name, firstName, birthDate, gender);
     }
 
+    @GetMapping("/{id}")
+    public Patient getPatient(@PathVariable Integer id) {
+        return patientService.getPatientById(id);
+    }
+
     @PostMapping
     public ResponseEntity<Patient> addPatient(@RequestBody Patient patient) {
         Patient savedPatient = patientService.savePatient(patient);
         return new ResponseEntity<>(savedPatient, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePatient(@PathVariable Integer id) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Patient> updatePatient(@PathVariable Integer id, @RequestBody Patient patient) {
         try {
-            patientService.deletePatient(id);
-            return ResponseEntity.noContent().build();
-        } catch (EmptyResultDataAccessException error) {
+            patientService.updatePatient(id, patient);
+            return ResponseEntity.ok().build();
+        } catch (Exception exception) {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deletePatient(@PathVariable Integer id) {
+//        try {
+//            patientService.deletePatient(id);
+//            return ResponseEntity.noContent().build();
+//        } catch (EmptyResultDataAccessException exception) {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 }

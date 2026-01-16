@@ -40,7 +40,7 @@
             </thead>
             <tbody>
 
-            <tr th:each="patient : ${patients}">
+            <tr th:each="patient : ${patients}" th:onclick="|window.location='@{/patients/{id}(id=${patient.id})}'|">
                 <td th:text="${patient.name}">Nom</td>
                 <td th:text="${patient.firstName}">Prénom</td>
                 <td th:text="${#temporals.format(patient.birthDate, 'dd/MM/yyyy')}"></td>

@@ -32,8 +32,12 @@ public class PatientService {
      * @return an Optional containing the Patient if found
      *         empty Optional otherwise
      */
-    public Optional<Patient> getPatientById(Integer id) {
-        return patientRepository.findById(id);
+    public Patient getPatientById(Integer id) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            throw new EmptyResultDataAccessException(1);
+        }
+        return patient.get();
     }
 
     /**
@@ -61,6 +65,24 @@ public class PatientService {
      */
     public Patient savePatient(Patient patient) {
         return patientRepository.save(patient);
+    }
+
+    /**
+     * Update an existing Patient.
+     * @param id, the id to the Patient to update.
+     * @param patientUpdated, a Patient object with the updated information.
+     * @return the patient that has been updated.
+     */
+    public Patient updatePatient(Integer id, Patient patientUpdated) {
+        Patient patientToUpdate = getPatientById(id);
+
+        patientToUpdate.setName(patientUpdated.getName());
+        patientToUpdate.setFirstName(patientUpdated.getFirstName());
+        patientToUpdate.setGender(patientUpdated.getGender());
+        patientToUpdate.setAddress(patientUpdated.getAddress());
+        patientToUpdate.setPhone(patientUpdated.getPhone());
+
+        return savePatient(patientToUpdate);
     }
 
     /**
