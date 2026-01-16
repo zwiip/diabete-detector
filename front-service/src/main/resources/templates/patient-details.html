@@ -11,46 +11,37 @@
         <h1>Détails du patient</h1>
         <h2 th:text="${patient.name} + ' ' + ${patient.firstName}"></h2>
         <form th:action="@{/patients/{id}(id=${patient.id})}" method="post"
-              th:object="${patient}">
+              th:object="${patient}" class="crud-group">
 
             <input type="hidden" th:field="*{id}" />
 
-            <div>
-                <label>Nom</label>
-                <input type="text" th:field="*{name}" />
+            <label>Nom</label>
+            <input type="text" th:field="*{name}" />
+
+            <label>Prénom</label>
+            <input type="text" th:field="*{firstName}" />
+
+            <label>Date de naissance</label>
+            <input type="date" th:value="${patient.birthDate}" disabled />
+
+            <label>Genre</label>
+            <select th:field="*{gender}">
+                <option value="MALE">Homme</option>
+                <option value="FEMALE">Femme</option>
+                <option value="OTHER">Autre</option>
+            </select>
+
+            <label>Adresse</label>
+            <input type="text" th:field="*{address}" />
+
+            <label>Téléphone</label>
+            <input type="text" th:field="*{phone}" />
+
+            <div class="form-buttons">
+                <button type="submit">Enregistrer</button>
+                <a th:href="@{/patients/search}" class="btn-secondary">Retour</a>
             </div>
 
-            <div>
-                <label>Prénom</label>
-                <input type="text" th:field="*{firstName}" />
-            </div>
-
-            <div>
-                <label>Date de naissance</label>
-                <input type="date" th:value="${patient.birthDate}" disabled />
-            </div>
-
-            <div>
-                <label>Genre</label>
-                <select th:field="*{gender}">
-                    <option value="MALE">Homme</option>
-                    <option value="FEMALE">Femme</option>
-                    <option value="OTHER">Autre</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Adresse</label>
-                <input type="text" th:field="*{address}" />
-            </div>
-
-            <div>
-                <label>Téléphone</label>
-                <input type="text" th:field="*{phone}" />
-            </div>
-
-            <button type="submit">Enregistrer</button>
-            <a th:href="@{/patients/search}">Retour</a>
         </form>
     </main>
 </body>

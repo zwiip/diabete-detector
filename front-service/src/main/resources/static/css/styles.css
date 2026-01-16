@@ -54,12 +54,6 @@ form {
     margin-bottom: 2rem;
 }
 
-.filter-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
 input, select {
     padding: 0.5rem 0.6rem;
     font-size: 0.9rem;
@@ -84,6 +78,45 @@ button {
 
 button:hover {
     background-color: #2568c7;
+}
+
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.crud-group {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    row-gap: 1rem;
+    column-gap: 1.5rem;
+    max-width: 700px;
+}
+
+.form-buttons {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content:end;
+    gap:1rem;
+    margin-top: 1rem;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    background-color: #e0e0e0;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #cfcfcf;
 }
 
 /* TABLES */

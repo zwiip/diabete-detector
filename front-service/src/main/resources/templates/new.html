@@ -9,46 +9,34 @@
 
 <h1>Ajouter un patient</h1>
 
-<form th:action="@{/patients}" method="post">
+<form th:action="@{/patients}" method="post" class="crud-group">
 
-    <div>
-        <label for="name">Nom</label>
-        <input type="text" id="name" name="name" required>
-    </div>
+    <label for="name">Nom</label>
+    <input type="text" id="name" name="name" required>
 
-    <div>
-        <label for="firstName">Prénom</label>
-        <input type="text" id="firstName" name="firstName" required>
-    </div>
+    <label for="firstName">Prénom</label>
+    <input type="text" id="firstName" name="firstName" required>
 
-    <div>
-        <label for="birthDate">Date de naissance</label>
-        <input type="date" id="birthDate" name="birthDate" required>
-    </div>
+    <label for="birthDate">Date de naissance</label>
+    <input type="date" id="birthDate" name="birthDate" required>
 
-    <div>
-        <label for="gender">Genre</label>
-        <select id="gender" name="gender" required>
-            <option value="">-- Sélectionner --</option>
-            <option value="MALE">Homme</option>
-            <option value="FEMALE">Femme</option>
-            <option value="OTHER">Autre</option>
-        </select>
-    </div>
+    <label for="gender">Genre</label>
+    <select id="gender" name="gender" required>
+        <option value="">-- Sélectionner --</option>
+        <option value="MALE">Homme</option>
+        <option value="FEMALE">Femme</option>
+        <option value="OTHER">Autre</option>
+    </select>
 
-    <div>
-        <label for="address">Adresse</label>
-        <input type="text" id="address" name="address">
-    </div>
+    <label for="address">Adresse</label>
+    <input type="text" id="address" name="address">
 
-    <div>
-        <label for="phone">Téléphone</label>
-        <input type="text" id="phone" name="phone">
-    </div>
+    <label for="phone">Téléphone</label>
+    <input type="text" id="phone" name="phone">
 
-    <div>
+    <div class="form-buttons">
         <button type="submit">Enregistrer</button>
-        <a th:href="@{/patients/search}">Annuler</a>
+        <a th:href="@{/patients/search}" class="btn-secondary">Annuler</a>
     </div>
 
 </form>
