@@ -32,7 +32,7 @@
             </select>
 
             <label>Adresse</label>
-            <input type="text" th:field="*{address}" />
+            <textarea id="address" name="address" rows="3" th:text="${patient.address}"></textarea>
 
             <label>Téléphone</label>
             <input type="text" th:field="*{phone}" />
