@@ -1,5 +1,6 @@
 package com.medilabo.front_service.controller;
 
+import com.medilabo.front_service.dto.NoteCreateDTO;
 import com.medilabo.front_service.dto.NoteDTO;
 import com.medilabo.front_service.dto.PatientDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,6 +74,17 @@ public class PatientController {
         return "redirect:/patients/search";
     }
 
+    @PostMapping("/notes")
+    public String createNote(@ModelAttribute NoteCreateDTO newNote) {
+        restTemplate.postForObject(
+                gatewayUrl + "/notes",
+                newNote,
+                Void.class
+        );
+
+        return "redirect:/patients/" + newNote.getPatientId();
+    }
+
     @GetMapping("/patients/{id}")
     public String patientDetails(@PathVariable Integer id, Model model) {
 
@@ -86,8 +98,12 @@ public class PatientController {
                 NoteDTO[].class
         ));
 
+        NoteCreateDTO newNote = new NoteCreateDTO();
+        newNote.setPatientId(id);
+
         model.addAttribute("patient", patient);
         model.addAttribute("notes", notes);
+        model.addAttribute("newNote", newNote);
         return "patient-details";
     }
 

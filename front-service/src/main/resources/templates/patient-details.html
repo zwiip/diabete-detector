@@ -38,12 +38,23 @@
             <input type="text" th:field="*{phone}" />
 
             <div class="form-buttons">
-                <button type="submit">Enregistrer</button>
+                <button type="submit">Enregistrer Informations</button>
                 <a th:href="@{/patients/search}" class="btn-secondary">Retour</a>
             </div>
         </form>
 
         <div class="notes-container">
+            <form class="add-note"
+                  th:action="@{/notes}" method="post"
+                  th:object="${newNote}">
+
+                <input type="hidden" th:field="*{patientId}" />
+
+                <label>Nouvelle note</label>
+                <textarea id="new-note" name="new-note" th:field="*{noteText}" rows="5"></textarea>
+                <button type="submit">Enregistrer note</button>
+            </form>
+
             <div th:each="note : ${notes}">
                 <p th:text="${#temporals.format(note.date, 'dd/MM/yyyy, HH:mm')}"></p>
                 <p th:text="${note.noteText}"></p>

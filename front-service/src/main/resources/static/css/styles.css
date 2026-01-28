@@ -158,7 +158,7 @@ table tr:hover {
 
 /* NOTES */
 
-.notes-container div {
+.notes-container div, .add-note {
     padding: 0.5rem 0.6rem;
     font-size: 0.9rem;
     border: 1px solid var(--color-secondary-darker);
@@ -166,6 +166,11 @@ table tr:hover {
     margin-bottom: 0.5rem;
 }
 
-.notes-container div p {
+.notes-container div p, .add-note * {
     margin: 0.5rem;
+}
+
+.add-note {
+    display: flex;
+    flex-direction: column;
 }
