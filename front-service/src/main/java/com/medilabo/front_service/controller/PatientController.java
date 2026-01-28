@@ -1,5 +1,6 @@
 package com.medilabo.front_service.controller;
 
+import com.medilabo.front_service.dto.NoteDTO;
 import com.medilabo.front_service.dto.PatientDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -80,7 +81,13 @@ public class PatientController {
                 PatientDTO.class
         );
 
+        List<NoteDTO> notes = Arrays.asList(restTemplate.getForObject(
+                gatewayUrl + "/notes/" + id,
+                NoteDTO[].class
+        ));
+
         model.addAttribute("patient", patient);
+        model.addAttribute("notes", notes);
         return "patient-details";
     }
 

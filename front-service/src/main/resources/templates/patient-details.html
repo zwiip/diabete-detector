@@ -41,8 +41,15 @@
                 <button type="submit">Enregistrer</button>
                 <a th:href="@{/patients/search}" class="btn-secondary">Retour</a>
             </div>
-
         </form>
+
+        <div class="notes-container">
+            <div th:each="note : ${notes}">
+                <p th:text="${note.date}"></p>
+                <p th:text="${note.noteText}"></p>
+            </div>
+        </div>
+
     </main>
 </body>
 </html>
