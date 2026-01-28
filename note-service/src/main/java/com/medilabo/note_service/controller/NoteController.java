@@ -17,8 +17,8 @@ public class NoteController {
         this.noteService = noteService;
     }
 
-    @GetMapping
-    public List<Note> getNotes(@RequestParam Integer patientId) {
+    @GetMapping("/{patientId}")
+    public List<Note> getNotesByPatientId(@PathVariable Integer patientId) {
         return noteService.getNotesByPatientId(patientId);
     }
 
