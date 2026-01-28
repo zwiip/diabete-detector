@@ -2,6 +2,7 @@ package com.medilabo.note_service.service;
 
 import com.medilabo.note_service.model.Note;
 import com.medilabo.note_service.repository.NoteRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,8 @@ public class NoteService {
     }
 
     public List<Note> getNotesByPatientId(Integer patientId) {
-        return noteRepository.findNotesByPatientId(patientId);
+        Sort sort = Sort.by(Sort.Direction.DESC, "date");
+        return noteRepository.findNotesByPatientId(patientId, sort);
     }
 
     public Note addNote(Integer patientId, String noteText) {
