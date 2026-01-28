@@ -155,3 +155,17 @@ table th {
 table tr:hover {
     background-color: var(--color-secondary-lighter);
 }
+
+/* NOTES */
+
+.notes-container div {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--color-secondary-darker);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.notes-container div p {
+    margin: 0.5rem;
+}

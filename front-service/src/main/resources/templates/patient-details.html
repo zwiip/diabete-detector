@@ -45,7 +45,7 @@
 
         <div class="notes-container">
             <div th:each="note : ${notes}">
-                <p th:text="${note.date}"></p>
+                <p th:text="${#temporals.format(note.date, 'dd/MM/yyyy, HH:mm')}"></p>
                 <p th:text="${note.noteText}"></p>
             </div>
         </div>
