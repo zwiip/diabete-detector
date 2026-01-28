@@ -18,6 +18,11 @@ public class GatewayRoutesConfig {
         return route("patient-service")
                 .route(path("/patients/**"), http())
                 .before(uri("http://localhost:8081"))
-                .build();
+                .build()
+
+                .and(route("note-service")
+                        .route(path("/notes/**"), http())
+                        .before(uri("http://localhost:8083"))
+                        .build());
     }
 }
