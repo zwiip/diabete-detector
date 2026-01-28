@@ -14,10 +14,9 @@ public class Note {
     private String noteText;
     private LocalDateTime date;
 
-    public Note(Integer patientId, String noteText, LocalDateTime date) {
+    public Note(Integer patientId, String noteText) {
         this.patientId = patientId;
         this.noteText = noteText;
-        this.date = date;
     }
 
     public Integer getPatientId() {
