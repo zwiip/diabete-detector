@@ -2,14 +2,12 @@ package com.medilabo.patientservice.controllers;
 
 import com.medilabo.patientservice.entities.Patient;
 import com.medilabo.patientservice.services.PatientService;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/patients")

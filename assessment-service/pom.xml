@@ -12,7 +12,7 @@
 	<artifactId>assessment-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>assessment-service</name>
-	<description>Service that return an assessment concerning the level of risk of a patient concerning diabete.</description>
+	<description>Service that return an assessment concerning the level of risk of a patient concerning diabetes.</description>
 	<url/>
 	<licenses>
 		<license/>

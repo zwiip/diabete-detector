@@ -12,7 +12,7 @@
 	<artifactId>gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>gateway</name>
-	<description>Gateway service for the diabete detector</description>
+	<description>Gateway service for the diabetes detector</description>
 	<url/>
 	<licenses>
 		<license/>

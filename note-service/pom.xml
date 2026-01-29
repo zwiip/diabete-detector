@@ -12,7 +12,7 @@
 	<artifactId>note-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>note-service</name>
-	<description>Note service for the diabete detector</description>
+	<description>Note service for the diabetes detector</description>
 	<url/>
 	<licenses>
 		<license/>
