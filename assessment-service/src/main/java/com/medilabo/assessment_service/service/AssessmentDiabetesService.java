@@ -32,20 +32,30 @@ public class AssessmentDiabetesService {
         AssessmentDiabetesDTO assessment = new AssessmentDiabetesDTO();
         assessment.setPatientId(id);
 
-        if (triggersWordsCount == 0) {
+        if (triggersWordsCount <= 1) {
             assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.NONE);
-            
-        } else if (triggersWordsCount >= 2 && triggersWordsCount <= 5 && patientAge > 30) {
-            assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.BORDERLINE);
-            
-        } else if (((triggersWordsCount == 6 || triggersWordsCount == 7) && patientAge > 30)
-                    || (patientAge < 30 && patientGender == PatientDTO.Gender.MALE && triggersWordsCount == 3)
-                    || (patientAge < 30 && patientGender == PatientDTO.Gender.FEMALE && triggersWordsCount == 4)) {
-            assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
-        } else if ((patientAge > 30 && triggersWordsCount >= 8)
-                    || (patientAge < 30 && patientGender == PatientDTO.Gender.MALE && triggersWordsCount >= 5)
-                    || (patientAge < 30 && patientGender == PatientDTO.Gender.FEMALE && triggersWordsCount >= 7)) {
-            assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
+        }
+
+        if (patientAge >= 30) {
+            if (triggersWordsCount <= 5) {
+                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.BORDERLINE);
+            } else if (triggersWordsCount <= 7) {
+                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
+            } else {
+                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
+            }
+        } else if (patientGender == PatientDTO.Gender.MALE) {
+            if (triggersWordsCount == 3) {
+                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
+            } else if (triggersWordsCount >= 5) {
+                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
+            }
+        } else if (patientGender == PatientDTO.Gender.FEMALE) {
+            if (triggersWordsCount >= 7) {
+                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
+            } else if (triggersWordsCount >= 4) {
+                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
+            }
         } else {
             assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.NONE);
         }
