@@ -10,38 +10,44 @@
     <main>
         <h1>Détails du patient</h1>
         <h2 th:text="${patient.name} + ' ' + ${patient.firstName}"></h2>
-        <form th:action="@{/patients/{id}(id=${patient.id})}" method="post"
-              th:object="${patient}" class="crud-group">
+        <div>
+            <form th:action="@{/patients/{id}(id=${patient.id})}" method="post"
+                  th:object="${patient}" class="crud-group">
 
-            <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:field="*{id}" />
 
-            <label>Nom</label>
-            <input type="text" th:field="*{name}" />
+                <label for="name">Nom</label>
+                <input id="name" name="name" type="text" th:field="*{name}" />
 
-            <label>Prénom</label>
-            <input type="text" th:field="*{firstName}" />
+                <label for="firstName">Prénom</label>
+                <input id="firstName" name="birthDate" type="text" th:field="*{firstName}" />
 
-            <label>Date de naissance</label>
-            <input type="date" th:value="${patient.birthDate}" disabled />
+                <label for="birthDate">Date de naissance</label>
+                <input id="birthDate" name="birthDate" type="date" th:value="${patient.birthDate}" disabled />
 
-            <label>Genre</label>
-            <select th:field="*{gender}">
-                <option value="MALE">Homme</option>
-                <option value="FEMALE">Femme</option>
-                <option value="OTHER">Autre</option>
-            </select>
+                <label for="gender">Genre</label>
+                <select id="gender" name="gender" th:field="*{gender}">
+                    <option value="MALE">Homme</option>
+                    <option value="FEMALE">Femme</option>
+                    <option value="OTHER">Autre</option>
+                </select>
 
-            <label>Adresse</label>
-            <textarea id="address" name="address" rows="3" th:text="${patient.address}"></textarea>
+                <label for="address">Adresse</label>
+                <textarea id="address" name="address" rows="3" th:text="${patient.address}"></textarea>
 
-            <label>Téléphone</label>
-            <input type="text" th:field="*{phone}" />
+                <label for="phone">Téléphone</label>
+                <input id="phone" name="phone" type="text" th:field="*{phone}" />
 
-            <div class="form-buttons">
-                <button type="submit">Enregistrer Informations</button>
-                <a th:href="@{/patients/search}" class="btn-secondary">Retour</a>
+                <div class="form-buttons">
+                    <button type="submit">Enregistrer Informations</button>
+                    <a th:href="@{/patients/search}" class="btn-secondary">Retour</a>
+                </div>
+            </form>
+
+            <div>
+                <p th:text="${assessment.riskLevel.name()}"></p>
             </div>
-        </form>
+        </div>
 
         <div class="notes-container">
             <form class="add-note"
@@ -50,7 +56,7 @@
 
                 <input type="hidden" th:field="*{patientId}" />
 
-                <label>Nouvelle note</label>
+                <label for="new-note">Nouvelle note</label>
                 <textarea id="new-note" name="new-note" th:field="*{noteText}" rows="5"></textarea>
                 <button type="submit">Enregistrer note</button>
             </form>

@@ -1,17 +1,17 @@
 package com.medilabo.assessment_service.dto;
 
 public class NoteDTO {
-    private String note;
+    private String noteText;
 
-    public NoteDTO(String note) {
-        this.note = note;
+    public NoteDTO(String noteText) {
+        this.noteText = noteText;
     }
 
-    public String getNote() {
-        return note;
+    public String getNoteText() {
+        return noteText;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public void setNoteText(String noteText) {
+        this.noteText = noteText;
     }
 }

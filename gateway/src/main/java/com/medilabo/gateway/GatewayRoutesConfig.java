@@ -23,6 +23,13 @@ public class GatewayRoutesConfig {
                 .and(route("note-service")
                         .route(path("/notes/**"), http())
                         .before(uri("http://localhost:8083"))
-                        .build());
+                        .build()
+                )
+
+                .and(route("assessment-service")
+                        .route(path("/assessment/**"), http())
+                        .before(uri("http://localhost:8084"))
+                        .build()
+                );
     }
 }

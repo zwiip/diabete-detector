@@ -1,5 +1,6 @@
 package com.medilabo.front_service.controller;
 
+import com.medilabo.front_service.dto.AssessmentDTO;
 import com.medilabo.front_service.dto.NoteCreateDTO;
 import com.medilabo.front_service.dto.NoteDTO;
 import com.medilabo.front_service.dto.PatientDTO;
@@ -98,12 +99,18 @@ public class PatientController {
                 NoteDTO[].class
         ));
 
+        AssessmentDTO assessment = restTemplate.getForObject(
+                gatewayUrl + "/assessment/" + id,
+                AssessmentDTO.class
+        );
+
         NoteCreateDTO newNote = new NoteCreateDTO();
         newNote.setPatientId(id);
 
         model.addAttribute("patient", patient);
         model.addAttribute("notes", notes);
         model.addAttribute("newNote", newNote);
+        model.addAttribute("assessment", assessment);
         return "patient-details";
     }
 
