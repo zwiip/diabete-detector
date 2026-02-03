@@ -10,7 +10,7 @@
     <main>
         <h1>Détails du patient</h1>
         <h2 th:text="${patient.name} + ' ' + ${patient.firstName}"></h2>
-        <div>
+        <div class="details-container">
             <form th:action="@{/patients/{id}(id=${patient.id})}" method="post"
                   th:object="${patient}" class="crud-group">
 
@@ -44,7 +44,9 @@
                 </div>
             </form>
 
-            <div>
+            <div class="assessment">
+                <h3>Evaluation risques</h3>
+                <h4>Diabète</h4>
                 <p th:text="${assessment.riskLevel.name()}"></p>
             </div>
         </div>

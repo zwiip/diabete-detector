@@ -104,7 +104,7 @@ button:hover {
     grid-template-columns: 200px 1fr;
     row-gap: 1rem;
     column-gap: 1.5rem;
-    max-width: 700px;
+    width: 70%;
 }
 
 .form-buttons {
@@ -154,6 +154,24 @@ table th {
 
 table tr:hover {
     background-color: var(--color-secondary-lighter);
+}
+
+/* DETAILS */
+.details-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.assessment {
+    margin: 2rem 0;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--color-secondary-darker);
+    border-radius: 4px;
+    width: 27%;
+}
+
+.assessment h3 {
+    margin-bottom: 0.5rem;
 }
 
 /* NOTES */
