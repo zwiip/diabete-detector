@@ -26,7 +26,6 @@ public class PatientController {
 
     @GetMapping("/search")
     public List<Patient> searchPatients(
-
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) LocalDate birthDate,

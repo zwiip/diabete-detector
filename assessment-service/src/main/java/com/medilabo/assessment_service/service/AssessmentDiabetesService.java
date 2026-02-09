@@ -6,22 +6,34 @@ import com.medilabo.assessment_service.dto.PatientDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+/**
+ * Service responsible for assessing the diabetes risk level of a patient.
+ * This service aggregates patient information and medical notes
+ * retrieved through the gateway, analyzes the presence of predefined
+ * trigger words in medical notes, and determines the patient's diabetes
+ * risk level according to given logical rules.
+ */
 
 @Service
 public class AssessmentDiabetesService {
 
     @Value("${gateway.url}")
     private String gatewayUrl;
-    private final RestTemplate restTemplate;
+    private final GatewayClient gatewayClient;
     private static final Logger log = LoggerFactory.getLogger(AssessmentDiabetesService.class);
     private static final Set<String> TRIGGER_WORDS_DIABETES = Set.of(
             "Hémoglobine A1C",
@@ -38,10 +50,17 @@ public class AssessmentDiabetesService {
             "Anticorps"
     );
 
-    public AssessmentDiabetesService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public AssessmentDiabetesService(GatewayClient gatewayClient) {
+        this.gatewayClient = gatewayClient;
     }
 
+    /**
+     * Assess the diabetes risk for a given patient.
+     * The method uses several private methods in order to gather the patient information and his medical notes that are compared to a list of trigger words .
+     * Then it applies a logical algorithm to determine the risk.
+     * @param id, the unique identifier of the patient.
+     * @return a AssessmentDiabetesDTO object containing the id of the patient and his risk level.
+     */
     public AssessmentDiabetesDTO getPatientDiabetesRiskAssessment(Integer id) {
         log.info("Creating assessment diabetes for patient n°{}", id);
         PatientDTO patient = getPatientInfo(id);
@@ -58,6 +77,7 @@ public class AssessmentDiabetesService {
         if (triggersWordsCount <= 1) {
             log.debug("Triggers words count is {}, that is less equal to one word, it's a none", triggersWordsCount);
             assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.NONE);
+
         } else if (patientAge >= 30) {
             log.debug("this patient is {}, this is older or equal to 30", patientAge);
             if (triggersWordsCount <= 5) {
@@ -70,6 +90,7 @@ public class AssessmentDiabetesService {
                 log.debug("Triggers words = {}, it's more than 7. So it's a earlyonset", triggersWordsCount);
                 assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
             }
+
         } else if (patientGender == PatientDTO.Gender.MALE) {
             log.debug("this patient is {}, this is younger than 30 and it's a male = {}", patientAge, patientGender);
             if (triggersWordsCount < 5) {
@@ -79,6 +100,7 @@ public class AssessmentDiabetesService {
                 log.debug("Triggers words = {}, it equals to 3. So it's a in danger", triggersWordsCount);
                 assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
             }
+
         } else if (patientGender == PatientDTO.Gender.FEMALE) {
             log.debug("this patient is {}, this is younger than 30 and it's a female = {}", patientAge, patientGender);
             if (triggersWordsCount >= 7) {
@@ -88,30 +110,69 @@ public class AssessmentDiabetesService {
                 log.debug("Triggers words = {}, it's more or equal to 4'. So it's a in danger", triggersWordsCount);
                 assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
             }
+
         } else {
             log.debug("nothing special to record here");
             assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.NONE);
         }
+
         log.info("Risk assessment = {}", assessment.getRiskLevel());
         return assessment;
     }
 
+    /**
+     * Retrieves patient information from the gateway
+     * @param id, the patient unique identifier,
+     * @return a PatientDTO object with the needed information (birthdate and gender).
+     */
     private PatientDTO getPatientInfo(Integer id) {
-        log.debug("Fetching the patient information for the id: {}", id);
-        return restTemplate.getForObject(
-                gatewayUrl + "/patients/" + id,
-                PatientDTO.class
-        );
+        try {
+            PatientDTO patient = gatewayClient.get("/patients/" + id, PatientDTO.class);
+
+            if (patient == null || patient.getBirthDate() == null || patient.getGender() == null) {
+                throw new IllegalStateException("Incomplete patient data for id " + id);
+            }
+
+            return patient;
+
+        } catch (Exception e) {
+            log.error("Error fetching patient info for id {}: {}", id, e.getMessage());
+            throw new IllegalStateException("Error fetching patient info for id " + id, e);
+        }
     }
 
+    /**
+     * Retrieves all medical notes associated to the patient.
+     * @param id, the patient unique identifier,
+     * @return an array with the NoteDTO objects containing the texts of the note. Can be empty.
+     */
     private NoteDTO[] getPatientNotes(Integer id) {
-        log.debug("Fetching notes for the id: {}", id);
-        return restTemplate.getForObject(
-                gatewayUrl + "/notes/" + id,
-                NoteDTO[].class
-        );
+        try {
+            return gatewayClient.get("/notes/" + id, NoteDTO[].class);
+        } catch (Exception e) {
+            log.error("Error fetching notes for patient id {}: {}", id, e.getMessage());
+            return new NoteDTO[0];
+        }
     }
 
+    /**
+     * Adds the Basic Auth header for gateway calls
+     * @return an HttpHeaders object with the correct auth.
+     */
+    private HttpHeaders createGatewayHeaders() {
+        String auth = "gateway:gateway-secret";
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuth);
+        return headers;
+    }
+
+    /**
+     * Extracts and normalizes all words from the patient's medical notes.
+     * @param notes, an array with the patient's medical notes
+     * @return a List of words cleaned and extracted from the notes
+     */
     private List<String> getCleanedNotes(NoteDTO[] notes) {
         if (notes == null || notes.length == 0) {
             log.warn("No notes to clean.");
@@ -137,20 +198,41 @@ public class AssessmentDiabetesService {
         return wordsFromNotes;
     }
 
+    /**
+     * Normalizes a String by removing the accents and converting it to lowercase.
+     * This method is used bith for medical notes and trigger words to ensure consistent comparisons.
+     * @param textToNormalize, the raw String
+     * @return a normalized version of the String.
+     */
     private String normalizeText(String textToNormalize) {
         return  Normalizer.normalize(textToNormalize, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
                 .toLowerCase();
     }
 
-    private int getAge(LocalDate birthdate) {
-        log.debug("Calculating age for the date: {}", birthdate);
+    /**
+     * Calculates the patient's age in years, based on the birthDate.
+     * @param birthDate, LocalDate of the patient's date of birth
+     * @return an int representing the age in years.
+     */
+    private int getAge(LocalDate birthDate) {
+        log.debug("Calculating age for the date: {}", birthDate);
         return Period.between(
-                birthdate,
+                birthDate,
                 LocalDate.now()
         ).getYears();
     }
 
+    /**
+     * Counts how many distinct trigger words are present in the patient's notes.
+     * A trigger word is considered found if:
+     * a word from the notes partially matches the normalized trigger word and vice versa,
+     * This prefix-based matching allows singular/plural and minor variations.
+     * However, it increases the number of matches if several similar word are used in the triggers list.
+     * We recommend to add to the trigger list only word's stems.
+     * @param notesWords, a List of String of word we want to check.
+     * @return an int representing the number of matches with the triggers list.
+     */
     private int getTriggersWordsCount(List<String> notesWords) {
         log.debug("starting count for this text ={}", notesWords);
 

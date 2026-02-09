@@ -1,15 +1,16 @@
 package com.medilabo.front_service.controller;
 
+import com.medilabo.front_service.client.GatewayClient;
 import com.medilabo.front_service.dto.AssessmentDTO;
 import com.medilabo.front_service.dto.NoteCreateDTO;
 import com.medilabo.front_service.dto.NoteDTO;
 import com.medilabo.front_service.dto.PatientDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
@@ -20,13 +21,10 @@ import java.util.Optional;
 @Controller
 public class PatientController {
 
-    @Value("${gateway.url}")
-    private String gatewayUrl;
+    private final GatewayClient gatewayClient;
 
-    private final RestTemplate restTemplate;
-
-    public PatientController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public PatientController(GatewayClient gatewayClient) {
+        this.gatewayClient = gatewayClient;
     }
 
     @GetMapping("/patients/search")
@@ -36,18 +34,17 @@ public class PatientController {
                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                    LocalDate birthDate,
                                @RequestParam(required = false) String gender,
+                               HttpServletRequest request,
                                Model model) {
 
+        String path = UriComponentsBuilder.fromPath("/patients/search")
+                .queryParamIfPresent("name", Optional.ofNullable(name))
+                .queryParamIfPresent("firstName", Optional.ofNullable(firstName))
+                .queryParamIfPresent("birthDate", Optional.ofNullable(birthDate))
+                .queryParamIfPresent("gender", Optional.ofNullable(gender))
+                .toUriString();
 
-        String url = UriComponentsBuilder.fromHttpUrl(gatewayUrl  + "/patients/search")
-            .queryParamIfPresent("name", Optional.ofNullable(name))
-            .queryParamIfPresent("firstName", Optional.ofNullable(firstName))
-            .queryParamIfPresent("birthDate", Optional.ofNullable(birthDate))
-            .queryParamIfPresent("gender", Optional.ofNullable(gender))
-            .toUriString();
-
-
-        PatientDTO[] response = restTemplate.getForObject(url, PatientDTO[].class);
+        PatientDTO[] response = gatewayClient.get(request, path, PatientDTO[].class);
         List<PatientDTO> patients = Arrays.asList(response);
 
         model.addAttribute("activePage", "patients/search");
@@ -65,44 +62,34 @@ public class PatientController {
     }
 
     @PostMapping("/patients")
-    public String createPatient(@ModelAttribute PatientDTO patient) {
-        restTemplate.postForObject(
-                gatewayUrl + "/patients",
-                patient,
-                Void.class
-        );
+    public String createPatient(@ModelAttribute PatientDTO patient, HttpServletRequest request) {
+        gatewayClient.post(request, "/patients", patient);
 
         return "redirect:/patients/search";
     }
 
     @PostMapping("/notes")
-    public String createNote(@ModelAttribute NoteCreateDTO newNote) {
-        restTemplate.postForObject(
-                gatewayUrl + "/notes",
-                newNote,
-                Void.class
-        );
+    public String createNote(@ModelAttribute NoteCreateDTO newNote,
+                             HttpServletRequest request) {
 
+        gatewayClient.post(request, "/notes", newNote);
         return "redirect:/patients/" + newNote.getPatientId();
     }
 
     @GetMapping("/patients/{id}")
-    public String patientDetails(@PathVariable Integer id, Model model) {
+    public String patientDetails(@PathVariable Integer id,
+                                 HttpServletRequest request,
+                                 Model model) {
 
-        PatientDTO patient = restTemplate.getForObject(
-                gatewayUrl + "/patients/" + id,
-                PatientDTO.class
+        PatientDTO patient =
+                gatewayClient.get(request, "/patients/" + id, PatientDTO.class);
+
+        List<NoteDTO> notes = Arrays.asList(
+                gatewayClient.get(request, "/notes/" + id, NoteDTO[].class)
         );
 
-        List<NoteDTO> notes = Arrays.asList(restTemplate.getForObject(
-                gatewayUrl + "/notes/" + id,
-                NoteDTO[].class
-        ));
-
-        AssessmentDTO assessment = restTemplate.getForObject(
-                gatewayUrl + "/assessment/" + id,
-                AssessmentDTO.class
-        );
+        AssessmentDTO assessment =
+                gatewayClient.get(request, "/assessment/" + id, AssessmentDTO.class);
 
         NoteCreateDTO newNote = new NoteCreateDTO();
         newNote.setPatientId(id);
@@ -111,18 +98,16 @@ public class PatientController {
         model.addAttribute("notes", notes);
         model.addAttribute("newNote", newNote);
         model.addAttribute("assessment", assessment);
+
         return "patient-details";
     }
 
     @PostMapping("/patients/{id}")
     public String updatePatient(@PathVariable Integer id,
-                                @ModelAttribute PatientDTO patient) {
+                                @ModelAttribute PatientDTO patient,
+                                HttpServletRequest request) {
 
-        restTemplate.put(
-                gatewayUrl + "/patients/" + id,
-                patient
-        );
-
+        gatewayClient.put(request, "/patients/" + id, patient);
         return "redirect:/patients/" + id;
     }
 }
