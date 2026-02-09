@@ -9,6 +9,11 @@
     <header th:insert="~{header}"></header>
     <main>
         <h1>Détails du patient</h1>
+
+        <div th:if="${errorMessage}" class="error-message">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
         <h2 th:text="${patient.name} + ' ' + ${patient.firstName}"></h2>
         <div class="details-container">
             <form th:action="@{/patients/{id}(id=${patient.id})}" method="post"
@@ -46,12 +51,17 @@
 
             <div class="assessment">
                 <h3>Evaluation risques</h3>
+
                 <h4>Diabète</h4>
-                <p th:text="${assessment.riskLevel.name()}"></p>
+                <p th:text="${assessment !=null ? assessment.riskLevel.name() : assessmentError}"></p>
             </div>
         </div>
 
         <div class="notes-container">
+            <div th:if="${notesError}">
+                <p th:text="${notesError}"></p>
+            </div>
+
             <form class="add-note"
                   th:action="@{/notes}" method="post"
                   th:object="${newNote}">

@@ -11,6 +11,10 @@
 
         <h1>Ajouter un patient</h1>
 
+        <div th:if="${errorMessage}" class="error-message">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
         <form th:action="@{/patients}" method="post" class="crud-group">
 
             <label for="name">Nom</label>

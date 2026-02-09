@@ -10,6 +10,10 @@
     <main>
         <h1>Liste des patients</h1>
 
+        <div th:if="${errorMessage}" class="error-message">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
         <!-- Zone de recherche et de filtrage -->
         <form th:action="@{/patients/search}" method="get">
             <div class="filter-group">
