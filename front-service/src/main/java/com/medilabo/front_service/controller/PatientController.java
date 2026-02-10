@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
@@ -62,7 +63,7 @@ public class PatientController {
 
         try {
             response = gatewayClient.get(request, path, PatientDTO[].class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error fetching the patients", e);
             model.addAttribute("errorMessage", "Impossible de récupérer les patients pour le moment.");
         }
@@ -105,7 +106,7 @@ public class PatientController {
         try {
             gatewayClient.post(request, "/patients", patient);
             log.info("New patient created: {} {}", patient.getName(), patient.getFirstName());
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error creating the patient", e);
             model.addAttribute("errorMessage", "Impossible de créer le patient pour le moment.");
             return "new";
@@ -124,8 +125,10 @@ public class PatientController {
         try {
             gatewayClient.post(request, "/notes", newNote);
             log.info("New note created for patientId={}", newNote.getPatientId());
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error creating note for patientId={}", newNote.getPatientId(), e);
+            model.addAttribute("errorMessage", "Impossible d'ajouter la note.");
+            return "patient-details";
         }
 
         return "redirect:/patients/" + newNote.getPatientId();
@@ -149,7 +152,7 @@ public class PatientController {
                 model.addAttribute("errorMessage", "Patient non trouvé.");
                 return "patient-details";
             }
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error fetching patient for id={}", id, e);
             model.addAttribute("errorMessage", "Impossible de récupérer les informations du patient.");
         }
@@ -157,7 +160,7 @@ public class PatientController {
         List<NoteDTO> notes = List.of();
         try {
             notes = Arrays.asList(gatewayClient.get(request, "/notes/" + id, NoteDTO[].class));
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error fetching notes for patient id={}", id, e);
             model.addAttribute("notesError", "Impossible de récupérer les notes du patient.");
         }
@@ -165,7 +168,7 @@ public class PatientController {
         AssessmentDTO assessment = null;
         try {
             assessment = gatewayClient.get(request, "/assessment/" + id, AssessmentDTO.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error fetching assessment for patient id={}", id, e);
             model.addAttribute("assessmentError", "Impossible de récupérer l'évaluation médicale.");
         }
@@ -193,7 +196,7 @@ public class PatientController {
         try {
             gatewayClient.put(request, "/patients/" + id, patient);
             log.info("Patient updated: id={}, Name= {}", id, patient.getName());
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.error("Error updating patient: id={}, Name ={}", id, patient.getName(), e);
             model.addAttribute("errorMessage", "Impossible de mettre à jour le patient pour le moment.");
             return "patient-details";

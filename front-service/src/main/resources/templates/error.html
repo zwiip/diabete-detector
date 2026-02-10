@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Erreur</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header th:insert="~{header}"></header>
+    <main>
+        <h1>Oups 😕</h1>
+
+        <p class="error-message" th:text="${errorMessage}">Une erreur est survenue.</p>
+
+        <div th:if="${errorType == 'SERVICE_UNAVAILABLE'}">
+            <p class="error-message">Merci de réessayer dans quelques instants.</p>
+        </div>
+
+        <div th:if="${errorType == 'INTERNAL_ERROR'}">
+            <p class="error-message">Si le problème persiste, contactez le support.</p>
+        </div>
+
+        <a href="/">Retour à l’accueil</a>
+    </main>
+</body>
+</html>
