@@ -13,6 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Security Configuration for the gateway.
+ * Handle the authentication with two ways
+ * - A form login for the human user (doctor) to access the gateway;
+ * - A HTTP Basic for internal communication, using a system user (gatewayUser), so the ressources can only be access by the gateway.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
