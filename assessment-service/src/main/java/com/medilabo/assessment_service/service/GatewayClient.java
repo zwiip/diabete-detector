@@ -10,6 +10,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class GatewayClient {
+    @Value("${gateway.username}")
+    private String gatewayUsername;
+
+    @Value("${gateway.password}")
+    private String gatewayPassword;
 
     @Value("${gateway.url}")
     private String gatewayUrl;
@@ -22,7 +27,7 @@ public class GatewayClient {
 
     public <T> T get(String path, Class<T> clazz) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth("gateway", "gateway-secret");
+        headers.setBasicAuth(gatewayUsername, gatewayPassword);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
         ResponseEntity<T> response = restTemplate.exchange(gatewayUrl + path, HttpMethod.GET, entity, clazz);
         return response.getBody();

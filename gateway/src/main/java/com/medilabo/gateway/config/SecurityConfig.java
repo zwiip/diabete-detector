@@ -1,5 +1,6 @@
 package com.medilabo.gateway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Value("${gateway.services.front.url}")
+    private String frontServiceUrl;
+
+    @Value("${doctor.username}")
+    private String doctorUsername;
+
+    @Value("${doctor.password}")
+    private String doctorPassword;
+
+    @Value("${gateway.username}")
+    private String gatewayUsername;
+
+    @Value("${gateway.password}")
+    private String gatewayPassword;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -31,7 +47,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .defaultSuccessUrl("http://localhost:8082/patients/search", true)
+                        .defaultSuccessUrl(frontServiceUrl + "/patients/search", true)
                         .permitAll()
                 )
                 .httpBasic(httpBasic -> {})
@@ -47,14 +63,14 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails doctor = User.builder()
-                .username("doctor")
-                .password(passwordEncoder.encode("password"))
+                .username(doctorUsername)
+                .password(passwordEncoder.encode(doctorPassword))
                 .roles("USER")
                 .build();
 
         UserDetails gatewayUser = User.builder()
-                .username("gateway")
-                .password(passwordEncoder.encode("gateway-secret"))
+                .username(gatewayUsername)
+                .password(passwordEncoder.encode(gatewayPassword))
                 .roles("GATEWAY")
                 .build();
 
