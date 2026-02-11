@@ -1,6 +1,7 @@
 package com.medilabo.patientservice.services;
 
 import com.medilabo.patientservice.entities.Patient;
+import com.medilabo.patientservice.exceptions.PatientNotFoundException;
 import com.medilabo.patientservice.repositories.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PatientServiceTest {
-
     private PatientService patientService;
 
     private Patient patientNone;
@@ -59,6 +59,14 @@ class PatientServiceTest {
 
         assertNotNull(patient);
         assertEquals("TestNone", patient.getName());
+    }
+
+    @Test
+    void givenUnknownId_whenGetPatientById_shouldThrowException() {
+        when(patientRepository.findById(9999)).thenReturn(Optional.empty());
+
+        assertThrows(PatientNotFoundException.class,
+                () -> patientService.getPatientById(9999));
     }
 
     @Test

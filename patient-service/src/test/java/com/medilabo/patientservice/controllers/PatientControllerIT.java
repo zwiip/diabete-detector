@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class PatientControllerIT {
-
+    //TODO ajouter authentification dans les tests .with(httpBasic("gateway", "gateway-secret")) après perform avant dernière )
     @Autowired
     private MockMvc mockMvc;
 
@@ -57,6 +57,12 @@ public class PatientControllerIT {
     @AfterEach
     void tearDown() {
         patientRepository.deleteAll();
+    }
+
+    @Test
+    void whenNoAuthentication_thenUnauthorized() throws Exception {
+        mockMvc.perform(get("/patients"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -98,18 +104,8 @@ public class PatientControllerIT {
     }
 
     @Test
-    void givenFourPatients_deletePatient_ShouldResultInThreePatients() throws Exception {
-        mockMvc.perform(delete("/patients/" + patientNone.getId()))
-                .andExpect(status().isNoContent());
-
-        assertEquals(3, patientRepository.count());
-    }
-
-    @Test
-    void givenAWrongID_deletePatient_shouldReturnNotFound() throws Exception {
-        mockMvc.perform(delete("/patients/9999"))
+    void givenUnknownId_whenGetPatient_shouldReturnNotFound() throws Exception {
+        mockMvc.perform(get("/patients/9999"))
                 .andExpect(status().isNotFound());
-
-        assertEquals(4, patientRepository.count());
     }
 }

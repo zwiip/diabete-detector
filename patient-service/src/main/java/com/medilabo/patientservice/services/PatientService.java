@@ -1,16 +1,18 @@
 package com.medilabo.patientservice.services;
 
 import com.medilabo.patientservice.entities.Patient;
+import com.medilabo.patientservice.exceptions.PatientNotFoundException;
 import com.medilabo.patientservice.repositories.PatientRepository;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PatientService {
+    private static final Logger log = LoggerFactory.getLogger(PatientService.class);
 
     private final PatientRepository patientRepository;
 
@@ -29,15 +31,14 @@ public class PatientService {
     /**
      * Retrieves a Patient according to its Identifier.
      * @param id, Integer : the patient identifier we want to retrieve.
-     * @return an Optional containing the Patient if found
-     *         empty Optional otherwise
+     * @return the founded Patient
+     * @throws PatientNotFoundException if no matching patient found
      */
     public Patient getPatientById(Integer id) {
-        Optional<Patient> patient = patientRepository.findById(id);
-        if (patient.isEmpty()) {
-            throw new EmptyResultDataAccessException(1);
-        }
-        return patient.get();
+        log.debug("Fetching patient with id {}", id);
+
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
     }
 
     /**
@@ -74,6 +75,8 @@ public class PatientService {
      * @return the patient that has been updated.
      */
     public Patient updatePatient(Integer id, Patient patientUpdated) {
+        log.info("Updating patient with id {}", id);
+
         Patient patientToUpdate = getPatientById(id);
 
         patientToUpdate.setName(patientUpdated.getName());
@@ -82,18 +85,6 @@ public class PatientService {
         patientToUpdate.setAddress(patientUpdated.getAddress());
         patientToUpdate.setPhone(patientUpdated.getPhone());
 
-        return savePatient(patientToUpdate);
-    }
-
-    /**
-     * Deletes a patient by its identifier.
-     * @param id, Integer : the patient identifier we want to delete.
-     * @throws EmptyResultDataAccessException if no patient exists with the given id. The (1) indicates how many lines we expected to impact.
-     */
-    public void deletePatient(Integer id) {
-        if (!patientRepository.existsById(id)) {
-            throw new EmptyResultDataAccessException(1);
-        }
-        patientRepository.deleteById(id);
+        return patientRepository.save(patientToUpdate);
     }
 }
