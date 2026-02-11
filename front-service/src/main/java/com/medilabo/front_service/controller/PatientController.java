@@ -50,7 +50,7 @@ public class PatientController {
                                @RequestParam(required = false) String gender,
                                HttpServletRequest request,
                                Model model) {
-        log.info("Searching for patients : name= {}, firstname= {}, birthDate= {}, gender= {}", name, firstName, birthDate, gender);
+        log.debug("Searching for patients : name= {}, firstname= {}, birthDate= {}, gender= {}", name, firstName, birthDate, gender);
 
         String path = UriComponentsBuilder.fromPath("/patients/search")
                 .queryParamIfPresent("name", Optional.ofNullable(name))
