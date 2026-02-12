@@ -75,7 +75,7 @@ public class PatientService {
      * @return the patient that has been updated.
      */
     public Patient updatePatient(Integer id, Patient patientUpdated) {
-        log.info("Updating patient with id {}", id);
+        log.debug("Updating patient with id {}", id);
 
         Patient patientToUpdate = getPatientById(id);
 
