@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -24,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class PatientControllerIT {
-    //TODO ajouter authentification dans les tests .with(httpBasic("gateway", "gateway-secret")) après perform avant dernière )
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -33,6 +35,12 @@ public class PatientControllerIT {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Value("${gateway.username}")
+    private String gatewayUsername;
+
+    @Value("${gateway.password}")
+    private String gatewayPassword;
 
     private Patient patientNone;
     private Patient patientBorderline;
@@ -67,7 +75,8 @@ public class PatientControllerIT {
 
     @Test
     void givenFourPatients_whenGetAllPatients_returnFourPatients() throws Exception {
-        mockMvc.perform(get("/patients"))
+        mockMvc.perform(get("/patients")
+                        .with(httpBasic(gatewayUsername,gatewayPassword)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(4))
                 .andExpect(jsonPath("$[0].name").value("TestNone"));
@@ -75,7 +84,8 @@ public class PatientControllerIT {
 
     @Test
     void givenTwoPatientsFirstNameWithIN_whenSearchPatientsWithIn_shouldReturnTwoPatients() throws Exception {
-        mockMvc.perform(get("/patients/search").param("name", "in"))
+        mockMvc.perform(get("/patients/search").param("name", "in")
+                        .with(httpBasic(gatewayUsername,gatewayPassword)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].name").value("TestBorderline"));
@@ -85,8 +95,9 @@ public class PatientControllerIT {
     void givenFourPatients_addPatient_shouldResultInFourPatients() throws Exception {
 
         mockMvc.perform(post("/patients")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                        .with(httpBasic(gatewayUsername,gatewayPassword))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
                             {
                             "name": "New",
                             "firstName": "Patient",
@@ -95,7 +106,7 @@ public class PatientControllerIT {
                             "address": "Main Street",
                             "phone": "1111111111"
                             }
-                """))
+                        """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("New"))
                 .andExpect(jsonPath("$.firstName").value("Patient"));
@@ -105,7 +116,8 @@ public class PatientControllerIT {
 
     @Test
     void givenUnknownId_whenGetPatient_shouldReturnNotFound() throws Exception {
-        mockMvc.perform(get("/patients/9999"))
+        mockMvc.perform(get("/patients/9999")
+                        .with(httpBasic(gatewayUsername,gatewayPassword)))
                 .andExpect(status().isNotFound());
     }
 }
