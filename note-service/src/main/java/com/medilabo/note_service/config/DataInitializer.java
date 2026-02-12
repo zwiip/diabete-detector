@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Initializes tests' dataset.
+ * To be deleted for production.
+ */
 @Configuration
 public class DataInitializer {
 

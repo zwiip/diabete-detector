@@ -1,5 +1,6 @@
 package com.medilabo.note_service.service;
 
+import com.medilabo.note_service.dto.NoteCreateDTO;
 import com.medilabo.note_service.model.Note;
 import com.medilabo.note_service.repository.NoteRepository;
 import org.springframework.data.domain.Sort;
@@ -17,13 +18,23 @@ public class NoteService {
         this.noteRepository = noteRepository;
     }
 
+    /**
+     * Retrieves all the notes for a specific patient identifier
+     * @param patientId Integer
+     * @return a list of Note which can be empty.
+     */
     public List<Note> getNotesByPatientId(Integer patientId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "date");
         return noteRepository.findNotesByPatientId(patientId, sort);
     }
 
-    public Note addNote(Integer patientId, String noteText) {
-        Note note = new Note(patientId, noteText);
+    /**
+     * Save a new note to database.
+     * @param newNote a NoteCreateDTO object with the information for the new note.
+     * @return the saved Note object.
+     */
+    public Note addNote(NoteCreateDTO newNote) {
+        Note note = new Note(newNote.getPatientId(), newNote.getNoteText());
         note.setDate(LocalDateTime.now());
         return noteRepository.save(note);
     }

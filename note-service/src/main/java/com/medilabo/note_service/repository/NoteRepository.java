@@ -10,5 +10,11 @@ import java.util.List;
 @Repository
 public interface NoteRepository extends MongoRepository<Note, String> {
 
+    /**
+     * Custom method to find the notes matching a specific patient identifier.
+     * @param patientId Integer of the patient
+     * @param sort sort options for queries
+     * @return a List of Note, which can be empty.
+     */
     List<Note> findNotesByPatientId(Integer patientId, Sort sort);
 }
