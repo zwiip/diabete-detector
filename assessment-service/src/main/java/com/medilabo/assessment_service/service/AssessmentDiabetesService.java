@@ -84,41 +84,41 @@ public class AssessmentDiabetesService {
 
         // asked triggers == 0, but, nothing in particular is given for 1 (which is also NONE then).
         if (triggersWordsCount <= 1) {
-            log.debug("Triggers words count is {}, that is less equal to one word, it's a none", triggersWordsCount);
+            log.debug("Triggers words count is {}, that is less equal to one word, it's a NONE", triggersWordsCount);
 
         } else if (patientAge >= 30) {
             log.debug("this patient is {}, this is older or equal to 30", patientAge);
             if (triggersWordsCount <= 5) {
-                log.debug("Triggers words = {}, it's less or equal to 5. But more than 1. So it's a borderline", triggersWordsCount);
+                log.debug("Triggers words = {}, it's less or equal to 5. But more than 1. So it's a BORDERLINE", triggersWordsCount);
                 riskLevel = AssessmentDiabetesDTO.RiskLevel.BORDERLINE;
             } else if (triggersWordsCount <= 7) {
-                log.debug("Triggers words = {}, it's less or equal to 7 but more than 5. So it's a in danger", triggersWordsCount);
+                log.debug("Triggers words = {}, it's less or equal to 7 but more than 5. So it's an INDANGER", triggersWordsCount);
                 riskLevel = AssessmentDiabetesDTO.RiskLevel.INDANGER;
             } else {
-                log.debug("Triggers words = {}, it's more than 7. So it's a earlyonset", triggersWordsCount);
+                log.debug("Triggers words = {}, it's more than 7. So it's a EARLYONSET", triggersWordsCount);
                 riskLevel = AssessmentDiabetesDTO.RiskLevel.EARLYONSET;
             }
 
         } else if (patientGender == PatientDTO.Gender.MALE) {
             log.debug("this patient is {}, this is younger than 30 and it's a male = {}", patientAge, patientGender);
-            // "early on set" is for triggers >= 5, so the else represents "In danger". Normally it is for triggers == 3, but no rule is defined for 4. Logically it's in the same group than 3.
+            // "EARLYONSET" is for triggers >= 5, so the else represents "INDANGER". Normally it is for triggers == 3, but no rule is defined for 4. Logically it's in the same group than 3.
             if (triggersWordsCount >= 5) {
-                log.debug("Triggers words = {}, it's more or equals to 5. So it's a earlyonset", triggersWordsCount);
+                log.debug("Triggers words = {}, it's more or equals to 5. So it's a EARLYONSET", triggersWordsCount);
                 riskLevel = AssessmentDiabetesDTO.RiskLevel.EARLYONSET;
             } else if (triggersWordsCount >= 3){
-                log.debug("Triggers words = {}, it is more or equals to 3 but less than 5. So it's a in danger", triggersWordsCount);
+                log.debug("Triggers words = {}, it is more or equals to 3 but less than 5. So it's an INDANGER", triggersWordsCount);
                 riskLevel = AssessmentDiabetesDTO.RiskLevel.INDANGER;
             }
 
         } else if (patientGender == PatientDTO.Gender.FEMALE) {
             log.debug("this patient is {}, this is younger than 30 and it's a female = {}", patientAge, patientGender);
             if (triggersWordsCount >= 7) {
-                log.debug("Triggers words = {}, it's more or equal to 7. So it's a earlyonset", triggersWordsCount);
+                log.debug("Triggers words = {}, it's more or equal to 7. So it's a EARLYONSET", triggersWordsCount);
                 riskLevel = AssessmentDiabetesDTO.RiskLevel.EARLYONSET;
 
-            // In danger is for triggers == 4, but no rules are defined for 5 and 6, so it's logically in the same group.
+            // INDANGER is for triggers == 4, but no rules are defined for 5 and 6, so it's logically in the same group.
             } else if (triggersWordsCount >= 4) {
-                log.debug("Triggers words = {}, it's more or equal to 4, but less than 7'. So it's a in danger", triggersWordsCount);
+                log.debug("Triggers words = {}, it's more or equal to 4, but less than 7'. So it's an INDANGER", triggersWordsCount);
                 riskLevel = AssessmentDiabetesDTO.RiskLevel.INDANGER;
             }
         }
