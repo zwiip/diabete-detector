@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> {})
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 );
 
