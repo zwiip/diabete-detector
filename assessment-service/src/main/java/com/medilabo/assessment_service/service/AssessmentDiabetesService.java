@@ -5,16 +5,8 @@ import com.medilabo.assessment_service.dto.NoteDTO;
 import com.medilabo.assessment_service.dto.PatientDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.Period;
@@ -31,8 +23,6 @@ import java.util.*;
 @Service
 public class AssessmentDiabetesService {
 
-    @Value("${gateway.url}")
-    private String gatewayUrl;
     private final GatewayClient gatewayClient;
     private static final Logger log = LoggerFactory.getLogger(AssessmentDiabetesService.class);
     private static final Set<String> TRIGGER_WORDS_DIABETES = Set.of(
@@ -69,76 +59,88 @@ public class AssessmentDiabetesService {
         int triggersWordsCount = getTriggersWordsCount(notesWords);
         int patientAge = getAge(patient.getBirthDate());
         PatientDTO.Gender patientGender = patient.getGender();
-        log.debug("Patient information for this assessment : age={}, gender={}, number of notes={}, triggers'words count={} ", patientAge, patientGender, notes.length, triggersWordsCount);
 
         AssessmentDiabetesDTO assessment = new AssessmentDiabetesDTO();
         assessment.setPatientId(id);
+        assessment.setRiskLevel(determineRisk(patientAge, patientGender, triggersWordsCount));
+        log.info("Risk assessment = {}", assessment.getRiskLevel());
 
+        return assessment;
+    }
+
+    /**
+     * Determines the risk level according to given rules for a specific patient.
+     * These rules have been slightly modified in order to be more logic.
+     * Comments are spread through the algorithm to explain these changes.
+     * @param patientAge int representing the age of the patient
+     * @param patientGender enum to define the gender of the patient
+     * @param triggersWordsCount the number of triggers for this patient
+     * @return the riskLevel for the patient.
+     */
+    private AssessmentDiabetesDTO.RiskLevel determineRisk(int patientAge, PatientDTO.Gender patientGender, int triggersWordsCount) {
+        log.debug("Patient information for this assessment : age={}, gender={}, triggers'words count={} ", patientAge, patientGender, triggersWordsCount);
+
+        AssessmentDiabetesDTO.RiskLevel riskLevel = AssessmentDiabetesDTO.RiskLevel.NONE;
+
+        // asked triggers == 0, but, nothing in particular is given for 1 (which is also NONE then).
         if (triggersWordsCount <= 1) {
             log.debug("Triggers words count is {}, that is less equal to one word, it's a none", triggersWordsCount);
-            assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.NONE);
 
         } else if (patientAge >= 30) {
             log.debug("this patient is {}, this is older or equal to 30", patientAge);
             if (triggersWordsCount <= 5) {
-                log.debug("Triggers words = {}, it's less or equal to 5. So it's a borderline", triggersWordsCount);
-                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.BORDERLINE);
+                log.debug("Triggers words = {}, it's less or equal to 5. But more than 1. So it's a borderline", triggersWordsCount);
+                riskLevel = AssessmentDiabetesDTO.RiskLevel.BORDERLINE;
             } else if (triggersWordsCount <= 7) {
-                log.debug("Triggers words = {}, it's less or equal to 7. So it's a in danger", triggersWordsCount);
-                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
+                log.debug("Triggers words = {}, it's less or equal to 7 but more than 5. So it's a in danger", triggersWordsCount);
+                riskLevel = AssessmentDiabetesDTO.RiskLevel.INDANGER;
             } else {
                 log.debug("Triggers words = {}, it's more than 7. So it's a earlyonset", triggersWordsCount);
-                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
+                riskLevel = AssessmentDiabetesDTO.RiskLevel.EARLYONSET;
             }
 
         } else if (patientGender == PatientDTO.Gender.MALE) {
             log.debug("this patient is {}, this is younger than 30 and it's a male = {}", patientAge, patientGender);
-            if (triggersWordsCount < 5) {
-                log.debug("Triggers words = {}, it's more or equal to 5. So it's a earlyonset", triggersWordsCount);
-                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
-            } else {
-                log.debug("Triggers words = {}, it equals to 3. So it's a in danger", triggersWordsCount);
-                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
+            // "early on set" is for triggers >= 5, so the else represents "In danger". Normally it is for triggers == 3, but no rule is defined for 4. Logically it's in the same group than 3.
+            if (triggersWordsCount >= 5) {
+                log.debug("Triggers words = {}, it's more or equals to 5. So it's a earlyonset", triggersWordsCount);
+                riskLevel = AssessmentDiabetesDTO.RiskLevel.EARLYONSET;
+            } else if (triggersWordsCount >= 3){
+                log.debug("Triggers words = {}, it is more or equals to 3 but less than 5. So it's a in danger", triggersWordsCount);
+                riskLevel = AssessmentDiabetesDTO.RiskLevel.INDANGER;
             }
 
         } else if (patientGender == PatientDTO.Gender.FEMALE) {
             log.debug("this patient is {}, this is younger than 30 and it's a female = {}", patientAge, patientGender);
             if (triggersWordsCount >= 7) {
                 log.debug("Triggers words = {}, it's more or equal to 7. So it's a earlyonset", triggersWordsCount);
-                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.EARLYONSET);
-            } else if (triggersWordsCount >= 4) {
-                log.debug("Triggers words = {}, it's more or equal to 4'. So it's a in danger", triggersWordsCount);
-                assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.INDANGER);
-            }
+                riskLevel = AssessmentDiabetesDTO.RiskLevel.EARLYONSET;
 
-        } else {
-            log.debug("nothing special to record here");
-            assessment.setRiskLevel(AssessmentDiabetesDTO.RiskLevel.NONE);
+            // In danger is for triggers == 4, but no rules are defined for 5 and 6, so it's logically in the same group.
+            } else if (triggersWordsCount >= 4) {
+                log.debug("Triggers words = {}, it's more or equal to 4, but less than 7'. So it's a in danger", triggersWordsCount);
+                riskLevel = AssessmentDiabetesDTO.RiskLevel.INDANGER;
+            }
         }
 
-        log.info("Risk assessment = {}", assessment.getRiskLevel());
-        return assessment;
+        return riskLevel;
     }
 
     /**
      * Retrieves patient information from the gateway
      * @param id, the patient unique identifier,
      * @return a PatientDTO object with the needed information (birthdate and gender).
+     * @throws IllegalStateException if the patient information are null.
      */
     private PatientDTO getPatientInfo(Integer id) {
-        try {
-            PatientDTO patient = gatewayClient.get("/patients/" + id, PatientDTO.class);
+        log.debug("Fetching information for patient {}", id);
+        PatientDTO patient = gatewayClient.get("/patients/" + id, PatientDTO.class, id);
 
-            if (patient == null || patient.getBirthDate() == null || patient.getGender() == null) {
-                throw new IllegalStateException("Incomplete patient data for id " + id);
-            }
-
-            return patient;
-
-        } catch (Exception e) {
-            log.error("Error fetching patient info for id {}: {}", id, e.getMessage());
-            throw new IllegalStateException("Error fetching patient info for id " + id, e);
+        if (patient == null || patient.getBirthDate() == null || patient.getGender() == null) {
+            throw new IllegalStateException("Incomplete patient data for id " + id);
         }
+
+        return patient;
     }
 
     /**
@@ -147,25 +149,9 @@ public class AssessmentDiabetesService {
      * @return an array with the NoteDTO objects containing the texts of the note. Can be empty.
      */
     private NoteDTO[] getPatientNotes(Integer id) {
-        try {
-            return gatewayClient.get("/notes/" + id, NoteDTO[].class);
-        } catch (Exception e) {
-            log.error("Error fetching notes for patient id {}: {}", id, e.getMessage());
-            return new NoteDTO[0];
-        }
-    }
-
-    /**
-     * Adds the Basic Auth header for gateway calls
-     * @return an HttpHeaders object with the correct auth.
-     */
-    private HttpHeaders createGatewayHeaders() {
-        String auth = "gateway:gateway-secret";
-        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuth);
-        return headers;
+        log.debug("Fetching notes for patient {}", id);
+        NoteDTO[] notes = gatewayClient.get("/notes/" + id, NoteDTO[].class, id);
+        return notes != null ? notes : new NoteDTO[0];
     }
 
     /**
@@ -176,6 +162,7 @@ public class AssessmentDiabetesService {
     private List<String> getCleanedNotes(NoteDTO[] notes) {
         if (notes == null || notes.length == 0) {
             log.warn("No notes to clean.");
+
             return List.of();
         }
 
@@ -195,6 +182,7 @@ public class AssessmentDiabetesService {
             log.debug("Here are the words : {}", wordsFromNotes);
         }
         log.debug("Notes cleaned into {} words", wordsFromNotes.size());
+
         return wordsFromNotes;
     }
 
@@ -217,6 +205,7 @@ public class AssessmentDiabetesService {
      */
     private int getAge(LocalDate birthDate) {
         log.debug("Calculating age for the date: {}", birthDate);
+
         return Period.between(
                 birthDate,
                 LocalDate.now()
@@ -253,6 +242,7 @@ public class AssessmentDiabetesService {
         }
 
         log.debug("final number ={}", triggersWordsCount);
+
         return triggersWordsCount;
     }
 }
