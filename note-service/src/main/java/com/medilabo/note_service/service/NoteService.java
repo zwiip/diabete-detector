@@ -20,7 +20,7 @@ public class NoteService {
 
     /**
      * Retrieves all the notes for a specific patient identifier
-     * @param patientId Integer
+     * @param patientId Integer of the patient unique identifier.
      * @return a list of Note which can be empty.
      */
     public List<Note> getNotesByPatientId(Integer patientId) {
