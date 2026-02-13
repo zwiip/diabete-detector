@@ -31,7 +31,7 @@ public class Patient {
 
     @NotNull(message = "Gender must not be null")
     @Enumerated(EnumType.STRING)
-    @Column(length = 10, nullable = false)
+    @Column(nullable = false)
     private Gender gender;
 
     @Size(max = 255)
