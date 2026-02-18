@@ -39,7 +39,7 @@ Le projet est paramétré pour peupler automatiquement les base de données grâ
 
 ## Lancement du projet
 ### 1, Cloner le repository,
-git clone // TODO
+git clone https://github.com/zwiip/diabete-detector/
 cd diabete-detector
 
 ### 2, Construire les images Docker
